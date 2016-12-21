@@ -1,5 +1,14 @@
 package sqlviewer;
 
+/**
+ * SQLViewerCommandLine
+ * Datenbank Praktikum Termin 6
+ *
+ * Chris Thiele
+ * chris.thiele@haw-hamburg.de
+ * 21.12.2016
+ * */
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -50,7 +59,7 @@ public class SqlConsole {
         System.out.println("\nWählen sie eine Tabelle: ");
         userTableDecision = userInput.nextInt();
 
-        while(userTableDecision > tableNumberCounter || userTableDecision < 1) {
+        while((userTableDecision > tableNumberCounter || userTableDecision < 1)) {
             System.out.println("Eingabe fehlerhaft, bitte wiederholen: ");
             userTableDecision = userInput.nextInt();
         }
@@ -81,7 +90,7 @@ public class SqlConsole {
         }
 
         /* pause a program till next keystroke */
-        System.out.println("\nEnter drücken um eine weitere Tabelle auszugeben");
+        System.out.println("\nEnter drücken um eine weitere Tabellen auszugeben");
         System.in.read();
     }
 

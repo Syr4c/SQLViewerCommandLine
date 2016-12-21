@@ -1,6 +1,5 @@
 package sqlviewer;
 
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -9,12 +8,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class SqlViewer {
-    String loginName;
-    String loginPass;
-    Scanner scanner;
-    Connection connection;
+    final String connectionUrl = "jdbc:oracle:thin:@ora14.informatik.haw-hamburg.de:1521:inf14";
+    private String loginName;
+    private String loginPass;
+    private Scanner scanner;
+    private Connection connection;
 
-    public void showMenu(){
+    public void showMenu() throws SQLException {
         Integer counter = 1;
         Integer input = null;
         Integer tableColumCount = null;
@@ -26,60 +26,51 @@ public class SqlViewer {
 
 
         System.out.println("\nUser Tables:\n ");
-        try {
-            while (userTables.next()) {
-                System.out.println("(" + counter.toString() + ")" + userTables.getString(1));
-                counter++;
-            }
-        } catch (SQLException e){
-            e.printStackTrace();
+
+        while (userTables.next()) {
+            System.out.println("(" + counter.toString() + ")" + userTables.getString(1));
+            counter++;
         }
 
-        System.out.println("Wählen sie eine Tabelle: ");
+        System.out.println("\nWählen sie eine Tabelle: ");
         input = scanner.nextInt();
 
-        if (input > counter || input < 1){
+        if (input > counter || input < 1) {
             System.out.println("Eingabe fehlerhaft");
             showMenu();
         }
 
-        try {
-            userTables.absolute(input);
-            table = userTables.getString(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        userTables.absolute(input);
+        table = userTables.getString(1);
 
         specificTable = SqlBackend.getSpecificTable(connection, table);
 
-        try {
-            rsmd = specificTable.getMetaData();
-            tableColumCount = rsmd.getColumnCount();
+        rsmd = specificTable.getMetaData();
+        tableColumCount = rsmd.getColumnCount();
 
-            for(int i = 0; i < tableColumCount; i++){
-                columNames.add(rsmd.getCatalogName(i));
-            }
-        } catch (SQLException e){
-            e.printStackTrace();
+        for (int i = 1; i < tableColumCount; i++) {
+            columNames.add(rsmd.getCatalogName(i));
         }
 
-        for(int i = 0; i < (columNames.size()-1); i++){
+
+        for (int i = 0; i < (columNames.size() - 1); i++) {
             System.out.print(columNames.get(i) + " ");
         }
 
-        try {
-            while(specificTable.next()){
-                for(int i = 0; i < tableColumCount; i++){
-                    System.out.print(specificTable.getString(i) + " ");
-                }
-                System.out.print("\n");
+
+        while (specificTable.next()) {
+            for (int i = 1; i < tableColumCount; i++) {
+                System.out.print(specificTable.getString(i) + " ");
             }
-        } catch (SQLException e){
-            e.printStackTrace();
+            System.out.print("\n");
         }
+
+        System.out.println("Möchten Sie eine weitere Tabelle anzeigen?");
+
     }
 
-    public void getLogin(){
+
+    public void getLogin() throws SQLException, ClassNotFoundException {
         scanner = new Scanner(System.in);
 
         System.out.println("SQLViewer | DBP 6 | Chris Thiele");
@@ -89,7 +80,7 @@ public class SqlViewer {
         System.out.print("Login Pass: ");
         loginPass = scanner.nextLine();
 
-        connection = SqlBackend.getConnection(loginName, loginPass);
+        connection = SqlBackend.getConnection(loginName, loginPass, connectionUrl);
 
         showMenu();
     }
